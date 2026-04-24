@@ -425,7 +425,12 @@ class CircuitScene(QGraphicsScene):
 
     def _draw_comp(self, comp, selected):
         info = COMPONENTS[comp.kind]
-        color = QColor(255, 140, 0) if selected else QColor(0, 60, 180)
+        if selected:
+            color = QColor(255, 140, 0)
+        elif comp.color:
+            color = QColor(comp.color)
+        else:
+            color = QColor(0, 60, 180)
         wire_color = QColor(255, 140, 0) if selected else QColor(0, 0, 0)
         px1, py1 = comp.x1 * GRID_SIZE, comp.y1 * GRID_SIZE
 

@@ -32,6 +32,7 @@ def latex_template(convention: str = "european") -> str:
     return (
         "\\documentclass[border=10pt]{{standalone}}\n"
         f"\\usepackage[{convention}, siunitx]{{{{circuitikz}}}}\n"
+        "\\usepackage{{xcolor}}\n"
         "\\begin{{document}}\n"
         "{snippet}\n"
         "\\end{{document}}\n"

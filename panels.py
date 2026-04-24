@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QTreeWidget, QTreeWidgetItem, QGroupBox, QFormLayout,
-    QComboBox, QLineEdit, QPushButton,
+    QComboBox, QLineEdit, QPushButton, QColorDialog,
 )
 
 from models import Component, Busbar, COMPONENTS
@@ -48,6 +49,9 @@ class PropertyPanel(QGroupBox):
         self.current_edit.setPlaceholderText("e.g. I_1")
         self.annotation_edit = QLineEdit()
         self.annotation_edit.setPlaceholderText("e.g. 10\\Omega")
+        self.color_btn = QPushButton("Default")
+        self.color_btn.clicked.connect(self._pick_color)
+        self._color_value = ""
         self.delete_btn = QPushButton("Delete Selected")
         self.delete_btn.setEnabled(False)
 
@@ -56,6 +60,7 @@ class PropertyPanel(QGroupBox):
         layout.addRow("Value:", self.value_edit)
         layout.addRow("Current:", self.current_edit)
         layout.addRow("Annotation:", self.annotation_edit)
+        layout.addRow("Color:", self.color_btn)
         layout.addRow(self.delete_btn)
 
         self.kind_combo.currentIndexChanged.connect(self._apply)
@@ -76,6 +81,7 @@ class PropertyPanel(QGroupBox):
             self.value_edit.clear()
             self.current_edit.clear()
             self.annotation_edit.clear()
+            self._set_color_btn("")
             self._updating = False
             return
         self.setEnabled(True)
@@ -89,6 +95,8 @@ class PropertyPanel(QGroupBox):
             self.current_edit.clear()
             self.annotation_edit.setEnabled(False)
             self.annotation_edit.clear()
+            self.color_btn.setEnabled(False)
+            self._set_color_btn("")
         else:
             self.kind_combo.setEnabled(True)
             idx = self.kind_combo.findData(obj.kind)
@@ -100,6 +108,8 @@ class PropertyPanel(QGroupBox):
             self.current_edit.setText(obj.current)
             self.annotation_edit.setEnabled(True)
             self.annotation_edit.setText(obj.annotation)
+            self.color_btn.setEnabled(True)
+            self._set_color_btn(obj.color)
         self._updating = False
 
     def _apply(self):
@@ -115,9 +125,27 @@ class PropertyPanel(QGroupBox):
             self._current.value = self.value_edit.text()
             self._current.current = self.current_edit.text()
             self._current.annotation = self.annotation_edit.text()
+            self._current.color = self._color_value
         if self.on_changed:
             self.on_changed()
 
     def _on_delete(self):
         if self.on_delete:
             self.on_delete()
+
+    def _pick_color(self):
+        initial = QColor(self._color_value) if self._color_value else QColor(0, 60, 180)
+        c = QColorDialog.getColor(initial, self, "Component Color")
+        if c.isValid():
+            self._set_color_btn(c.name())
+            self._apply()
+
+    def _set_color_btn(self, hex_color: str):
+        self._color_value = hex_color
+        if hex_color:
+            self.color_btn.setText(hex_color)
+            self.color_btn.setStyleSheet(
+                f"background-color: {hex_color}; color: {'#fff' if QColor(hex_color).lightness() < 128 else '#000'};")
+        else:
+            self.color_btn.setText("Default")
+            self.color_btn.setStyleSheet("")

@@ -5,7 +5,18 @@ from models import Circuit, Component, Busbar, COMPONENTS
 
 
 def generate_latex(circuit: Circuit) -> str:
-    lines = [r"\begin{circuitikz}"]
+    # Collect unique hex colors and create LaTeX color definitions
+    colors_used: dict[str, str] = {}  # hex -> name
+    for comp in circuit.components:
+        if comp.color and comp.color not in colors_used:
+            name = f"usercolor{len(colors_used) + 1}"
+            colors_used[comp.color] = name
+
+    lines = []
+    for hex_color, name in colors_used.items():
+        raw = hex_color.lstrip("#")
+        lines.append(f"  \\definecolor{{{name}}}{{HTML}}{{{raw.upper()}}}")
+    lines.append(r"\begin{circuitikz}")
 
     for bb in circuit.busbars:
         lines.append(
@@ -30,14 +41,16 @@ def generate_latex(circuit: Circuit) -> str:
         value = f", v=${comp.value}$" if comp.value else ""
         current = f", i=${comp.current}$" if comp.current else ""
         annotation = f", a=${comp.annotation}$" if comp.annotation else ""
+        color_opt = f", color={{{colors_used[comp.color]}}}" if comp.color else ""
 
         if info.get("node_style"):
             style = info["node_style"]
             lbl = f"${comp.label}$" if comp.label else ""
-            lines.append(f"  \\draw {a} node[{style}] {{{lbl}}};")
+            draw_opts = f"[{colors_used[comp.color]}]" if comp.color else ""
+            lines.append(f"  \\draw{draw_opts} {a} node[{style}] {{{lbl}}};")
         else:
             kind = info["circuitikz"]
-            lines.append(f"  \\draw {a} to[{kind}{label}{value}{current}{annotation}] {b};")
+            lines.append(f"  \\draw {a} to[{kind}{label}{value}{current}{annotation}{color_opt}] {b};")
 
     lines.append(r"\end{circuitikz}")
     return "\n".join(lines)
@@ -50,7 +63,8 @@ def circuit_to_dict(circuit: Circuit) -> dict:
         "components": [
             {"kind": c.kind, "label": c.label, "value": c.value,
              "x1": c.x1, "y1": c.y1, "x2": c.x2, "y2": c.y2,
-             "current": c.current, "annotation": c.annotation}
+             "current": c.current, "annotation": c.annotation,
+             "color": c.color}
             for c in circuit.components
         ],
         "busbars": [

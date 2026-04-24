@@ -20,6 +20,7 @@ class Component:
     y2: int = 0
     current: str = ""
     annotation: str = ""
+    color: str = ""
     uid: int = field(default_factory=_next_uid)
 
 
