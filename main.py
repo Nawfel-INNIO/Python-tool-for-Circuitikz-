@@ -262,6 +262,9 @@ class CircuitScene(QGraphicsScene):
     # ── Mouse handling ──
 
     def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
+            self.cancel_place()
+            return
         if event.button() != Qt.LeftButton:
             return
         gx, gy = self._snap(event.scenePos())
@@ -270,20 +273,27 @@ class CircuitScene(QGraphicsScene):
             self._try_select(gx, gy)
         elif self._mode == "place_single":
             self._add_single(gx, gy)
+            self._mode = "idle"
+            self._active_kind = None
+            self._clear_preview()
         elif self._mode == "place_first":
             self._first_pos = (gx, gy)
             self._mode = "place_second"
         elif self._mode == "place_second":
             self._add_two_terminal(*self._first_pos, gx, gy)
             self._first_pos = None
-            self._mode = "place_first"
+            self._mode = "idle"
+            self._active_kind = None
+            self._clear_preview()
         elif self._mode == "busbar_first":
             self._first_pos = (gx, gy)
             self._mode = "busbar_second"
         elif self._mode == "busbar_second":
             self._add_busbar(*self._first_pos, gx, gy)
             self._first_pos = None
-            self._mode = "busbar_first"
+            self._mode = "idle"
+            self._active_kind = None
+            self._clear_preview()
         elif self._mode == "wire":
             self._wire_points.append((gx, gy))
             if len(self._wire_points) >= 2:
@@ -323,21 +333,31 @@ class CircuitScene(QGraphicsScene):
 
     # ── Selection ──
 
+    @staticmethod
+    def _point_to_segment_dist2(px, py, x1, y1, x2, y2):
+        """Squared distance from point (px,py) to segment (x1,y1)-(x2,y2)."""
+        dx, dy = x2 - x1, y2 - y1
+        if dx == 0 and dy == 0:
+            return (px - x1) ** 2 + (py - y1) ** 2
+        t = max(0, min(1, ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)))
+        cx, cy = x1 + t * dx, y1 + t * dy
+        return (px - cx) ** 2 + (py - cy) ** 2
+
     def _try_select(self, gx, gy):
         best, best_dist = None, float("inf")
         for comp in self.circuit.components:
             info = COMPONENTS[comp.kind]
             if info.get("node_style"):
-                dx, dy = gx - comp.x1, gy - comp.y1
+                d = (gx - comp.x1) ** 2 + (gy - comp.y1) ** 2
             else:
-                dx, dy = gx - (comp.x1 + comp.x2) / 2, gy - (comp.y1 + comp.y2) / 2
-            d = dx * dx + dy * dy
+                d = self._point_to_segment_dist2(gx, gy, comp.x1, comp.y1, comp.x2, comp.y2)
             if d < best_dist:
                 best_dist, best = d, comp
         for bb in self.circuit.busbars:
-            if abs(gy - bb.y) <= 0.5 and bb.x_start <= gx <= bb.x_end:
-                best_dist, best = 0, bb
-        self._selected = best if best_dist <= 4 else None
+            d = self._point_to_segment_dist2(gx, gy, bb.x_start, bb.y, bb.x_end, bb.y)
+            if d < best_dist:
+                best_dist, best = d, bb
+        self._selected = best if best_dist <= 2.5 else None
         self._redraw()
         if self.on_selection_changed:
             self.on_selection_changed(self._selected)
