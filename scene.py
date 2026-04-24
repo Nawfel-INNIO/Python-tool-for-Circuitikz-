@@ -52,6 +52,7 @@ class CircuitScene(QGraphicsScene):
         self._counters[kind] = n
         prefixes = {
             "R": "R", "C": "C", "L": "L", "V": "V", "I": "I", "D": "D",
+            "battery": "V", "lamp": "La", "pushbtn": "PB", "spst": "S",
             "breaker": "CB", "fuse": "F", "discon": "DS", "switch": "SW",
             "CT": "CT", "trafo": "T", "gen": "G", "motor": "M", "arrester": "SA",
         }
@@ -436,6 +437,15 @@ class CircuitScene(QGraphicsScene):
                     self.addLine(px1 - 10, py1 + 10, px1 + 10, py1 + 10, pen),
                     self.addLine(px1 - 6, py1 + 15, px1 + 6, py1 + 15, pen),
                     self.addLine(px1 - 2, py1 + 20, px1 + 2, py1 + 20, pen),
+                ]
+                for it in items:
+                    it.setZValue(2)
+                self._dynamic_items.extend(items)
+            elif comp.kind == "vcc":
+                pen = QPen(color, 2)
+                items = [
+                    self.addLine(px1, py1, px1, py1 - 10, pen),
+                    self.addLine(px1 - 8, py1 - 10, px1 + 8, py1 - 10, pen),
                 ]
                 for it in items:
                     it.setZValue(2)

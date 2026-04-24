@@ -44,17 +44,25 @@ class PropertyPanel(QGroupBox):
         self.label_edit.setPlaceholderText("e.g. R_1")
         self.value_edit = QLineEdit()
         self.value_edit.setPlaceholderText("e.g. 1k\\Omega")
+        self.current_edit = QLineEdit()
+        self.current_edit.setPlaceholderText("e.g. I_1")
+        self.annotation_edit = QLineEdit()
+        self.annotation_edit.setPlaceholderText("e.g. 10\\Omega")
         self.delete_btn = QPushButton("Delete Selected")
         self.delete_btn.setEnabled(False)
 
         layout.addRow("Type:", self.kind_combo)
         layout.addRow("Label:", self.label_edit)
         layout.addRow("Value:", self.value_edit)
+        layout.addRow("Current:", self.current_edit)
+        layout.addRow("Annotation:", self.annotation_edit)
         layout.addRow(self.delete_btn)
 
         self.kind_combo.currentIndexChanged.connect(self._apply)
         self.label_edit.textChanged.connect(self._apply)
         self.value_edit.textChanged.connect(self._apply)
+        self.current_edit.textChanged.connect(self._apply)
+        self.annotation_edit.textChanged.connect(self._apply)
         self.delete_btn.clicked.connect(self._on_delete)
         self.setEnabled(False)
 
@@ -66,6 +74,8 @@ class PropertyPanel(QGroupBox):
             self.delete_btn.setEnabled(False)
             self.label_edit.clear()
             self.value_edit.clear()
+            self.current_edit.clear()
+            self.annotation_edit.clear()
             self._updating = False
             return
         self.setEnabled(True)
@@ -75,6 +85,10 @@ class PropertyPanel(QGroupBox):
             self.label_edit.setText(obj.label)
             self.value_edit.setEnabled(False)
             self.value_edit.clear()
+            self.current_edit.setEnabled(False)
+            self.current_edit.clear()
+            self.annotation_edit.setEnabled(False)
+            self.annotation_edit.clear()
         else:
             self.kind_combo.setEnabled(True)
             idx = self.kind_combo.findData(obj.kind)
@@ -82,6 +96,10 @@ class PropertyPanel(QGroupBox):
             self.label_edit.setText(obj.label)
             self.value_edit.setEnabled(True)
             self.value_edit.setText(obj.value)
+            self.current_edit.setEnabled(True)
+            self.current_edit.setText(obj.current)
+            self.annotation_edit.setEnabled(True)
+            self.annotation_edit.setText(obj.annotation)
         self._updating = False
 
     def _apply(self):
@@ -95,6 +113,8 @@ class PropertyPanel(QGroupBox):
                 self._current.kind = new_kind
             self._current.label = self.label_edit.text()
             self._current.value = self.value_edit.text()
+            self._current.current = self.current_edit.text()
+            self._current.annotation = self.annotation_edit.text()
         if self.on_changed:
             self.on_changed()
 

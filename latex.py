@@ -28,6 +28,8 @@ def generate_latex(circuit: Circuit) -> str:
         b = f"({comp.x2},{-comp.y2})"
         label = f", l=${comp.label}$" if comp.label else ""
         value = f", v=${comp.value}$" if comp.value else ""
+        current = f", i=${comp.current}$" if comp.current else ""
+        annotation = f", a=${comp.annotation}$" if comp.annotation else ""
 
         if info.get("node_style"):
             style = info["node_style"]
@@ -35,7 +37,7 @@ def generate_latex(circuit: Circuit) -> str:
             lines.append(f"  \\draw {a} node[{style}] {{{lbl}}};")
         else:
             kind = info["circuitikz"]
-            lines.append(f"  \\draw {a} to[{kind}{label}{value}] {b};")
+            lines.append(f"  \\draw {a} to[{kind}{label}{value}{current}{annotation}] {b};")
 
     lines.append(r"\end{circuitikz}")
     return "\n".join(lines)
@@ -47,7 +49,8 @@ def circuit_to_dict(circuit: Circuit) -> dict:
     return {
         "components": [
             {"kind": c.kind, "label": c.label, "value": c.value,
-             "x1": c.x1, "y1": c.y1, "x2": c.x2, "y2": c.y2}
+             "x1": c.x1, "y1": c.y1, "x2": c.x2, "y2": c.y2,
+             "current": c.current, "annotation": c.annotation}
             for c in circuit.components
         ],
         "busbars": [

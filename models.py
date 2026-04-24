@@ -18,6 +18,8 @@ class Component:
     y1: int
     x2: int = 0
     y2: int = 0
+    current: str = ""
+    annotation: str = ""
     uid: int = field(default_factory=_next_uid)
 
 
@@ -47,6 +49,12 @@ COMPONENTS = {
     "short":   {"name": "Wire",                "circuitikz": "short",          "category": "Basic"},
     "ground":  {"name": "Ground",              "circuitikz": "ground",         "category": "Basic",
                 "node_style": "ground"},
+    "vcc":     {"name": "VCC",                 "circuitikz": "vcc",            "category": "Basic",
+                "node_style": "vcc"},
+    "battery": {"name": "Battery",              "circuitikz": "battery1",       "category": "Basic"},
+    "lamp":    {"name": "Lamp",                "circuitikz": "lamp",           "category": "Basic"},
+    "pushbtn": {"name": "Push Button",          "circuitikz": "push button",    "category": "Basic"},
+    "spst":    {"name": "SPST Switch",          "circuitikz": "spst",           "category": "Basic"},
     # --- Power Systems ---
     "busbar":  {"name": "Busbar",              "circuitikz": "busbar",         "category": "Power Systems",
                 "special": True},
