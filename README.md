@@ -4,7 +4,6 @@ A Python desktop application for building circuit diagrams visually and generati
 
 ![Python](https://img.shields.io/badge/Python-3.13%2B-blue)
 ![PyQt5](https://img.shields.io/badge/GUI-PyQt5-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## Features
 
@@ -16,16 +15,6 @@ A Python desktop application for building circuit diagrams visually and generati
 - **Export .tex** — export a complete standalone LaTeX document
 - **Undo / Redo** — Ctrl+Z / Ctrl+Shift+Z with full state snapshots
 - **Property panel** — edit label, value, current arrow (`i=`), and annotation (`a=`) per component
-- **Zoom** — mouse wheel to zoom, "Zoom Fit" button to frame all components
-
-### Available Components
-
-| Basic | Power Systems |
-|---|---|
-| Resistor, Capacitor, Inductor | Busbar, Circuit Breaker, Fuse |
-| Voltage Source, Current Source, Diode | Disconnector, Switch, Transformer |
-| Battery, Lamp, Push Button, SPST Switch | Current Transformer, Generator, Motor |
-| Wire, Ground, VCC | Surge Arrester |
 
 ## Setup
 
@@ -56,10 +45,6 @@ uv pip install PyQt5 PyMuPDF
 
 # Windows CMD
 .\.venv\Scripts\activate.bat
-
-# Linux / macOS
-source .venv/bin/activate
-```
 
 ### 4. Install LaTeX dependencies
 
