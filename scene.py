@@ -140,7 +140,7 @@ class CircuitScene(QGraphicsScene):
             return f"Wire mode — click to add points ({n} so far), double-click/Esc to finish"
         return ""
 
-    # ── Undo / Redo ──
+    # -- Undo / Redo --
 
     def _snapshot(self):
         """Save current circuit state to undo stack."""
@@ -170,7 +170,7 @@ class CircuitScene(QGraphicsScene):
         if self.on_selection_changed:
             self.on_selection_changed(None)
 
-    # ── Placement API ──
+    # -- Placement API --
 
     def start_place(self, kind):
         self._clear_preview()
@@ -215,7 +215,7 @@ class CircuitScene(QGraphicsScene):
         if self.on_selection_changed:
             self.on_selection_changed(None)
 
-    # ── Mouse handling ──
+    # -- Mouse handling --
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
@@ -408,7 +408,7 @@ class CircuitScene(QGraphicsScene):
             self.removeItem(item)
         self._preview_items.clear()
 
-    # ── Selection ──
+    # -- Selection --
 
     @staticmethod
     def _point_to_segment_dist2(px, py, x1, y1, x2, y2):
@@ -438,7 +438,7 @@ class CircuitScene(QGraphicsScene):
         if self.on_selection_changed:
             self.on_selection_changed(self._selected)
 
-    # ── Add helpers ──
+    # -- Add helpers --
 
     def _add_single(self, gx, gy):
         label = self._next_label(self._active_kind)
@@ -465,7 +465,7 @@ class CircuitScene(QGraphicsScene):
         self.circuit.busbars.append(Busbar(label, y, xs, xe))
         self._redraw()
 
-    # ── Drawing ──
+    # -- Drawing --
 
     def _redraw(self):
         for item in self._dynamic_items:
@@ -830,7 +830,7 @@ class CircuitScene(QGraphicsScene):
             self._dynamic_items.append(dot)
 
 
-# ─── Canvas View ──────────────────────────────────────────────────────
+# --- Canvas View ------------------------------------------------------
 
 class CircuitCanvas(QGraphicsView):
     def __init__(self, scene: CircuitScene):

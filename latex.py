@@ -80,7 +80,7 @@ def generate_latex(circuit: Circuit) -> str:
     return "\n".join(lines)
 
 
-# ─── Serialization ────────────────────────────────────────────────────
+# --- Serialization ----------------------------------------------------
 
 def circuit_to_dict(circuit: Circuit) -> dict:
     return {

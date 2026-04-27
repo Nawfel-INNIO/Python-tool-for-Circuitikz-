@@ -39,7 +39,7 @@ def latex_template(convention: str = "european") -> str:
     )
 
 
-# ─── LaTeX Compilation Pipeline ───────────────────────────────────────
+# --- LaTeX Compilation Pipeline ---------------------------------------
 
 def find_pdflatex() -> str:
     if sys.platform == "win32":
@@ -87,7 +87,7 @@ def pdf_to_pixmap(pdf_path: Path, dpi: int = 200) -> QPixmap:
     return QPixmap.fromImage(qimg)
 
 
-# ─── Main Window ──────────────────────────────────────────────────────
+# --- Main Window ------------------------------------------------------
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -228,7 +228,7 @@ class MainWindow(QMainWindow):
         QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self._save)
         QShortcut(QKeySequence("Ctrl+O"), self).activated.connect(self._load)
 
-    # ── Callbacks ──
+    # -- Callbacks --
 
     def _on_palette_click(self, item, _column):
         kind = item.data(0, Qt.UserRole)
@@ -254,7 +254,7 @@ class MainWindow(QMainWindow):
     def _on_delete_selected(self):
         self.scene.delete_selected()
 
-    # ── Save / Load / Export ──
+    # -- Save / Load / Export --
 
     def _save(self):
         path = self._current_file
@@ -291,7 +291,7 @@ class MainWindow(QMainWindow):
         full = latex_template(conv).format(snippet=snippet)
         Path(path_str).write_text(full, encoding="utf-8")
 
-    # ── Render ──
+    # -- Render --
 
     def _do_render(self):
         self.error_label.hide()
