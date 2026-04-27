@@ -1,6 +1,6 @@
 # CircuitTikZ Visualizer
 
-A Python desktop application for building circuit diagrams visually and generating LaTeX [CircuitTikZ](https://ctan.org/pkg/circuitikz) code. Place components on a grid canvas, connect them with wires, and render the result as a PDF preview — all without writing LaTeX by hand.
+A Python desktop application for building circuit diagrams visually and generating LaTeX [CircuitTikZ](https://ctan.org/pkg/circuitikz) code. Place components on a grid canvas, connect them with wires, and render the result as a PDF preview, all without writing LaTeX by hand.
 
 ![Python](https://img.shields.io/badge/Python-3.13%2B-blue)
 ![PyQt5](https://img.shields.io/badge/GUI-PyQt5-green)
