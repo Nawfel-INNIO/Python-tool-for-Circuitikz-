@@ -47,7 +47,13 @@ def generate_latex(circuit: Circuit) -> str:
             style = info["node_style"]
             lbl = f"${comp.label}$" if comp.label else ""
             draw_opts = f"[{colors_used[comp.color]}]" if comp.color else ""
-            lines.append(f"  \\draw{draw_opts} {a} node[{style}] {{{lbl}}};")
+            if info.get("anchors"):
+                # Named node for multi-terminal components (transistors, op-amps, etc.)
+                node_name = comp.label.replace(" ", "").replace("_", "") if comp.label else f"node{comp.uid}"
+                color_prefix = f"[{colors_used[comp.color]}] " if comp.color else ""
+                lines.append(f"  \\node{color_prefix}[{style}] ({node_name}) at {a} {{{lbl}}};")
+            else:
+                lines.append(f"  \\draw{draw_opts} {a} node[{style}] {{{lbl}}};")
         else:
             kind = info["circuitikz"]
             lines.append(f"  \\draw {a} to[{kind}{label}{value}{current}{annotation}{color_opt}] {b};")

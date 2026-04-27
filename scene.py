@@ -55,6 +55,47 @@ class CircuitScene(QGraphicsScene):
             "battery": "V", "lamp": "La", "pushbtn": "PB", "spst": "S",
             "breaker": "CB", "fuse": "F", "discon": "DS", "switch": "SW",
             "CT": "CT", "trafo": "T", "gen": "G", "motor": "M", "arrester": "SA",
+            # Resistors
+            "vR": "VR", "pR": "PR", "sR": "SR", "ldR": "LDR", "varistor": "MOV",
+            "thR": "TH", "thRp": "THP", "thRn": "THN", "phR": "PHR",
+            # Capacitors
+            "eC": "EC", "cC": "CC", "vC": "VC", "PZ": "PZ",
+            # Inductors
+            "vL": "VL", "sL": "SL",
+            # Diodes
+            "zD": "ZD", "sD": "SD", "leD": "LED", "pD": "PD", "tD": "TD",
+            "VC": "VRC", "Ty": "TY", "Tr": "TR",
+            # Sources
+            "battery2": "V", "solar": "SOL", "sI": "SI", "cvsource": "CVS",
+            "cisource": "CIS", "dcvsource": "DCV", "dcisource": "DCI",
+            "sqV": "SQV", "nV": "NV", "nI": "NI", "esource": "ES", "pvsource": "PV",
+            # Instruments
+            "ammeter": "AM", "voltmeter": "VM", "ohmmeter": "OM", "rmeter": "RM",
+            # Switches
+            "toggle": "TOG", "ncs": "NCS", "reed": "RD",
+            # Miscellaneous
+            "afuse": "AF", "wfuse": "WF", "thermocouple": "TC", "bulb": "BL",
+            "mic": "MIC", "loudspeaker": "LS", "buzzer": "BZ", "sparkgap": "SG",
+            # Crossings
+            "crossing": "X", "jumpcross": "JX",
+            # Mechanical
+            "damper": "DA", "spring": "SP", "mass": "MA",
+            # Block Diagram
+            "amp": "AMP", "adc": "ADC", "dac": "DAC",
+            "bandpass": "BP", "lowpass": "LP", "highpass": "HP",
+            "mixer": "MX", "adder": "ADD", "oscillator": "OSC",
+            # Transistors
+            "npn": "Q", "pnp": "Q", "nmos": "M", "pmos": "M",
+            "nfet": "M", "pfet": "M", "nigbt": "Q", "pigbt": "Q",
+            # Amplifiers
+            "opamp": "U", "enamp": "U", "instamp": "U", "buffer": "U",
+            # Logic Gates — no auto-label
+            # Flip-Flops / ICs
+            "ffD": "FF", "ffJK": "FF", "ffT": "FF", "dipchip": "U",
+            # Transformers
+            "trafocore": "T", "gyrator": "GY",
+            # Tubes
+            "triode": "V", "pentode": "V",
         }
         prefix = prefixes.get(kind, "")
         return f"{prefix}_{n}" if prefix else ""
@@ -455,6 +496,115 @@ class CircuitScene(QGraphicsScene):
                 for it in items:
                     it.setZValue(2)
                 self._dynamic_items.extend(items)
+            elif comp.kind == "vee":
+                pen = QPen(color, 2)
+                items = [
+                    self.addLine(px1, py1, px1, py1 + 10, pen),
+                    self.addLine(px1 - 8, py1 + 10, px1 + 8, py1 + 10, pen),
+                ]
+                for it in items:
+                    it.setZValue(2)
+                self._dynamic_items.extend(items)
+            elif info["category"] == "Grounds & Power" or comp.kind in (
+                "rground", "sground", "tground", "nground", "cground",
+                "eground", "tlground", "pground",
+            ):
+                # Generic ground symbol
+                pen = QPen(color, 2)
+                items = [
+                    self.addLine(px1, py1, px1, py1 + 10, pen),
+                    self.addLine(px1 - 10, py1 + 10, px1 + 10, py1 + 10, pen),
+                    self.addLine(px1 - 6, py1 + 15, px1 + 6, py1 + 15, pen),
+                    self.addLine(px1 - 2, py1 + 20, px1 + 2, py1 + 20, pen),
+                ]
+                for it in items:
+                    it.setZValue(2)
+                self._dynamic_items.extend(items)
+            elif info["category"] == "Transistors":
+                # Draw transistor as a rectangle with label
+                pen = QPen(color, 2)
+                w, h = 24, 30
+                rect = self.addRect(
+                    px1 - w, py1 - h, 2 * w, 2 * h,
+                    pen, QBrush(QColor(255, 255, 255)),
+                )
+                rect.setZValue(2)
+                short_name = info["name"]
+                text = self.addText(short_name, QFont("Arial", 7, QFont.Bold))
+                text.setDefaultTextColor(color)
+                tr = text.boundingRect()
+                text.setPos(px1 - tr.width() / 2, py1 - tr.height() / 2)
+                text.setZValue(3)
+                self._dynamic_items.extend([rect, text])
+            elif info["category"] in ("Amplifiers",):
+                # Draw op-amp as a triangle
+                pen = QPen(color, 2)
+                from PyQt5.QtGui import QPolygonF
+                triangle = QPolygonF([
+                    QPointF(px1 - 20, py1 - 20),
+                    QPointF(px1 - 20, py1 + 20),
+                    QPointF(px1 + 20, py1),
+                ])
+                poly = self.addPolygon(triangle, pen, QBrush(QColor(255, 255, 255)))
+                poly.setZValue(2)
+                # + and - labels
+                plus = self.addText("+", QFont("Arial", 7))
+                plus.setDefaultTextColor(color)
+                plus.setPos(px1 - 18, py1 + 3)
+                plus.setZValue(3)
+                minus = self.addText("−", QFont("Arial", 7))
+                minus.setDefaultTextColor(color)
+                minus.setPos(px1 - 18, py1 - 15)
+                minus.setZValue(3)
+                self._dynamic_items.extend([poly, plus, minus])
+            elif info["category"] in ("Logic Gates", "Flip-Flops", "ICs"):
+                # Draw as a labeled rectangle
+                pen = QPen(color, 2)
+                w, h = 28, 22
+                if info["category"] == "Flip-Flops":
+                    w, h = 28, 30
+                elif info["category"] == "ICs":
+                    w, h = 30, 40
+                rect = self.addRect(
+                    px1 - w, py1 - h, 2 * w, 2 * h,
+                    pen, QBrush(QColor(255, 255, 255)),
+                )
+                rect.setZValue(2)
+                text = self.addText(info["name"][:4], QFont("Arial", 7, QFont.Bold))
+                text.setDefaultTextColor(color)
+                tr = text.boundingRect()
+                text.setPos(px1 - tr.width() / 2, py1 - tr.height() / 2)
+                text.setZValue(3)
+                self._dynamic_items.extend([rect, text])
+            elif info["category"] == "Transformers":
+                # Draw two coils side by side
+                pen = QPen(color, 2)
+                r = 12
+                left_coil = self.addEllipse(
+                    px1 - r - 4, py1 - r, 2 * r, 2 * r,
+                    pen, QBrush(QColor(255, 255, 255)),
+                )
+                right_coil = self.addEllipse(
+                    px1 + 4 - r, py1 - r, 2 * r, 2 * r,
+                    pen, QBrush(QColor(255, 255, 255)),
+                )
+                left_coil.setZValue(2)
+                right_coil.setZValue(2)
+                self._dynamic_items.extend([left_coil, right_coil])
+            elif info["category"] == "Tubes":
+                # Draw tube as a circle with label
+                r = 18
+                ellipse = self.addEllipse(
+                    px1 - r, py1 - r, 2 * r, 2 * r,
+                    QPen(color, 2), QBrush(QColor(255, 255, 255)),
+                )
+                ellipse.setZValue(2)
+                text = self.addText(info["name"][:3], QFont("Arial", 7, QFont.Bold))
+                text.setDefaultTextColor(color)
+                tr = text.boundingRect()
+                text.setPos(px1 - tr.width() / 2, py1 - tr.height() / 2)
+                text.setZValue(3)
+                self._dynamic_items.extend([ellipse, text])
             else:
                 r = 14
                 ellipse = self.addEllipse(
