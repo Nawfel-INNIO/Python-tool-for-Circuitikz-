@@ -4,7 +4,6 @@ A Python desktop application for building circuit diagrams visually and generati
 
 ![Python](https://img.shields.io/badge/Python-3.13%2B-blue)
 ![PyQt5](https://img.shields.io/badge/GUI-PyQt5-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## Features
 
