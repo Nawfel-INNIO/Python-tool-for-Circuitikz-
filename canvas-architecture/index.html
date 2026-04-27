@@ -1,0 +1,1116 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the CircuitTikZ Visualizer tool">
+      
+      
+      
+      
+        <link rel="prev" href="../pipeline/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Canvas Architecture - CircuitTikZ Visualizer</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#canvas-architecture-scenepy" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="CircuitTikZ Visualizer" class="md-header__button md-logo" aria-label="CircuitTikZ Visualizer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CircuitTikZ Visualizer
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Canvas Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Nawfel-INNIO/Python-tool-for-Circuitikz-" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="CircuitTikZ Visualizer" class="md-nav__button md-logo" aria-label="CircuitTikZ Visualizer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    CircuitTikZ Visualizer
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Nawfel-INNIO/Python-tool-for-Circuitikz-" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canvas Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canvas Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two Classes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grid-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grid System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Snapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-machine-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Machine (Modes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mouse-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mouse Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mouse Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mousepressevent-left-click" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mousePressEvent (left click)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mousepressevent-right-click" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mousePressEvent (right click)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mousedoubleclickevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mouseDoubleClickEvent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mousemoveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mouseMoveEvent
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dragging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dragging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drawing-_redraw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drawing (_redraw)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Drawing (_redraw)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#component-drawing-_draw_comp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Drawing (_draw_comp)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#annotations-on-two-terminal-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Annotations on Two-Terminal Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-dots-_draw_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Dots (_draw_nodes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pin-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pin Offsets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preview System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#undo-redo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Undo / Redo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#z-level-ordering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z-Level Ordering
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two Classes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grid-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Grid System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Snapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-machine-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Machine (Modes)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mouse-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mouse Handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mouse Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mousepressevent-left-click" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mousePressEvent (left click)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mousepressevent-right-click" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mousePressEvent (right click)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mousedoubleclickevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mouseDoubleClickEvent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mousemoveevent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mouseMoveEvent
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Selection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dragging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dragging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drawing-_redraw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drawing (_redraw)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Drawing (_redraw)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#component-drawing-_draw_comp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Drawing (_draw_comp)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#annotations-on-two-terminal-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Annotations on Two-Terminal Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-dots-_draw_nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node Dots (_draw_nodes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pin-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pin Offsets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preview-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preview System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#undo-redo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Undo / Redo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#z-level-ordering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z-Level Ordering
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="canvas-architecture-scenepy">Canvas Architecture — <code>scene.py</code></h1>
+<p>This document explains how the visual circuit editor canvas is implemented.</p>
+<h2 id="two-classes">Two Classes</h2>
+<p>The canvas is built with Qt's Graphics View Framework using two classes:</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Base Class</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CircuitScene</code></td>
+<td><code>QGraphicsScene</code></td>
+<td>Owns the data, handles all logic (placement, selection, drag, draw)</td>
+</tr>
+<tr>
+<td><code>CircuitCanvas</code></td>
+<td><code>QGraphicsView</code></td>
+<td>Thin viewport — zoom, mouse tracking, key forwarding</td>
+</tr>
+</tbody>
+</table>
+<p><code>CircuitCanvas</code> delegates almost everything to <code>CircuitScene</code>. It only handles:
+- Mouse wheel → zoom (scale by 1.15×)
+- Mouse move → forwards to <code>scene.update_preview()</code> or <code>scene.drag_move()</code>
+- Escape / Delete keys
+- <code>zoom_to_fit()</code> — computes bounding rect of all components and calls <code>fitInView()</code></p>
+<p>All the real work happens in <code>CircuitScene</code>.</p>
+<h2 id="grid-system">Grid System</h2>
+<ul>
+<li><strong>Grid size:</strong> 50 px per unit (<code>GRID_SIZE = 50</code>)</li>
+<li><strong>Grid extent:</strong> ±15 units → 31×31 grid = 961 dot positions</li>
+<li>Grid dots are drawn once in <code>_init_grid()</code> as tiny ellipses at z-level -10</li>
+<li>All component coordinates are stored in <strong>grid units</strong> (integers), not pixels</li>
+<li>Pixel conversion: <code>px = gx * GRID_SIZE</code>, <code>py = gy * GRID_SIZE</code></li>
+</ul>
+<h2 id="snapping">Snapping</h2>
+<p><code>_snap(pos)</code> converts a raw mouse position to the nearest grid point:
+1. Round to nearest integer grid coordinates
+2. If in placement or wiring mode, also check all pin offsets of existing components
+3. If a pin is within 1.5 grid units, snap to that pin instead</p>
+<h2 id="state-machine-modes">State Machine (Modes)</h2>
+<p>The scene operates as a state machine with these modes:</p>
+<pre><code>idle ──────────────┬──► place_single ──► idle     (one-click: grounds, nodes)
+                   ├──► place_first ──► place_second ──► idle   (two-click: R, C, L, etc.)
+                   ├──► busbar_first ──► busbar_second ──► idle
+                   └──► wire ──► wire ──► ... ──► idle   (multi-click, double-click to finish)
+</code></pre>
+<ul>
+<li><strong>idle</strong>: click to select, right-click to deselect, drag selected component</li>
+<li><strong>place_single</strong>: one click places a node-style component (ground, VCC, transistor, op-amp)</li>
+<li><strong>place_first / place_second</strong>: two clicks define start and end of a two-terminal component</li>
+<li><strong>busbar_first / busbar_second</strong>: two clicks define a busbar span</li>
+<li><strong>wire</strong>: each click adds a waypoint; consecutive pairs become <code>short</code> components; double-click or Escape finishes</li>
+</ul>
+<p>Mode transitions happen via <code>_set_mode()</code>, which also fires the <code>on_mode_changed</code> callback so <code>MainWindow</code> can update the status bar text.</p>
+<h2 id="mouse-handling">Mouse Handling</h2>
+<h3 id="mousepressevent-left-click"><code>mousePressEvent</code> (left click)</h3>
+<p>Depending on current mode:
+- <strong>idle</strong>: try to start a drag on the selected component, or call <code>_try_select()</code> to find the nearest component
+- <strong>place_single</strong>: add component, return to idle
+- <strong>place_first</strong>: store first position, move to <code>place_second</code>
+- <strong>place_second</strong>: add two-terminal component between first and second click, return to idle
+- <strong>wire</strong>: append waypoint, create a <code>short</code> segment between last two waypoints</p>
+<h3 id="mousepressevent-right-click"><code>mousePressEvent</code> (right click)</h3>
+<p>Cancels the current placement mode or deselects.</p>
+<h3 id="mousedoubleclickevent"><code>mouseDoubleClickEvent</code></h3>
+<p>In wire mode, finishes the wire and returns to idle.</p>
+<h3 id="mousemoveevent"><code>mouseMoveEvent</code></h3>
+<ul>
+<li>If dragging: calls <code>drag_move()</code> to reposition the drag target</li>
+<li>Otherwise: calls <code>update_preview()</code> to show a crosshair at the snapped position and a dashed line from the first click point</li>
+</ul>
+<h2 id="selection">Selection</h2>
+<p><code>_try_select(gx, gy)</code> finds the closest component or busbar:
+- <strong>Node-style components</strong>: distance = squared distance to (x1, y1)
+- <strong>Two-terminal components</strong>: distance = point-to-segment distance (using projection formula in <code>_point_to_segment_dist2</code>)
+- <strong>Busbars</strong>: same point-to-segment distance
+- Selects the nearest object if distance ≤ 2.5 grid units; otherwise deselects</p>
+<p>Selection fires <code>on_selection_changed</code> so the property panel updates.</p>
+<h2 id="dragging">Dragging</h2>
+<p>When clicking on an already-selected component in idle mode:</p>
+<ol>
+<li><code>_drag_hit()</code> checks what part was clicked:</li>
+<li>Near (x1, y1) → drag <code>"start"</code> endpoint</li>
+<li>Near (x2, y2) → drag <code>"end"</code> endpoint</li>
+<li>Near the body (line segment) → drag <code>"body"</code> (moves both endpoints)</li>
+<li>Node-style components → always drag as <code>"body"</code></li>
+<li><code>drag_move()</code> updates the component coordinates to the new snapped position on each mouse move</li>
+<li><code>mouseReleaseEvent</code> ends the drag</li>
+</ol>
+<p>Busbars have similar logic via <code>_busbar_drag_hit()</code> (start/end/body).</p>
+<h2 id="drawing-_redraw">Drawing (<code>_redraw</code>)</h2>
+<p>Every time the circuit changes, <code>_redraw()</code> is called:</p>
+<ol>
+<li>Removes all items in <code>_dynamic_items</code> from the scene</li>
+<li>Redraws all busbars (<code>_draw_busbar</code>)</li>
+<li>Redraws all components (<code>_draw_comp</code>)</li>
+<li>Draws connection node dots (<code>_draw_nodes</code>)</li>
+<li>Fires <code>on_circuit_changed</code> callback (triggers LaTeX regeneration)</li>
+</ol>
+<h3 id="component-drawing-_draw_comp">Component Drawing (<code>_draw_comp</code>)</h3>
+<p>Components are drawn differently based on their type:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Visual Representation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>short</code> (wire)</td>
+<td>Simple line in black/orange</td>
+</tr>
+<tr>
+<td>Two-terminal (R, C, L, etc.)</td>
+<td>Line with a labeled box at midpoint</td>
+</tr>
+<tr>
+<td>Ground variants</td>
+<td>Vertical line + horizontal bars (decreasing width)</td>
+</tr>
+<tr>
+<td>VCC / VEE</td>
+<td>Vertical line + horizontal bar</td>
+</tr>
+<tr>
+<td>Transistors</td>
+<td>Rectangle with type name</td>
+</tr>
+<tr>
+<td>Op-amps</td>
+<td>Triangle with +/− labels</td>
+</tr>
+<tr>
+<td>Logic gates, ICs</td>
+<td>Labeled rectangle (size varies by category)</td>
+</tr>
+<tr>
+<td>Transformers</td>
+<td>Two side-by-side circles (coils)</td>
+</tr>
+<tr>
+<td>Tubes</td>
+<td>Circle with label</td>
+</tr>
+<tr>
+<td>Generator / Motor</td>
+<td>Circle with G or M letter</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Colors:</strong>
+- Selected → orange <code>(255, 140, 0)</code>
+- Custom color → from <code>comp.color</code>
+- Default → blue <code>(0, 60, 180)</code>
+- Wires → black when unselected, orange when selected</p>
+<h3 id="annotations-on-two-terminal-components">Annotations on Two-Terminal Components</h3>
+<p>Three annotation layers are drawn alongside the component line:</p>
+<ol>
+<li><strong>Voltage (red)</strong>: value text + polarity symbols (+/−), positioned perpendicular to the line. Direction controlled by <code>voltage_dir</code> (v=, v&lt;=, v^=, v_=).</li>
+<li><strong>Current (green)</strong>: arrow + label, positioned below or above. Direction controlled by <code>current_dir</code> (i=, i&lt;=, i^=, i_=).</li>
+<li><strong>Flow (blue)</strong>: arrow + label, similar to current. Direction controlled by <code>flow_dir</code> (f=, f&lt;=, f^=, f_=).</li>
+</ol>
+<h3 id="node-dots-_draw_nodes">Node Dots (<code>_draw_nodes</code>)</h3>
+<p>Black filled dots (6px diameter, z-level 4) at every endpoint and pin position, indicating connection points.</p>
+<h3 id="pin-offsets">Pin Offsets</h3>
+<p>Multi-port components (transistors, op-amps, ICs) define <code>pin_offsets</code> in the <code>COMPONENTS</code> registry — relative grid offsets for each named pin. These are drawn as small gray dots with labels, and the snapping system uses them for precise wiring.</p>
+<h2 id="preview-system">Preview System</h2>
+<p><code>update_preview()</code> draws temporary visual aids (stored in <code>_preview_items</code>, cleared each frame):
+- Orange dashed crosshair at the current snapped position
+- Green highlight circle when snapped to a pin
+- Dashed line from first click point (during two-click placement)
+- Dashed line from last wire waypoint (during wire mode)</p>
+<h2 id="undo-redo">Undo / Redo</h2>
+<ul>
+<li><code>_snapshot()</code> serializes the entire <code>Circuit</code> to a dict (via <code>circuit_to_dict</code>) and pushes it onto <code>_undo_stack</code>. Clears <code>_redo_stack</code>.</li>
+<li><code>undo()</code> pushes current state to redo stack, pops from undo stack, deserializes</li>
+<li><code>redo()</code> reverses the process</li>
+<li>Snapshots are taken before any mutation (place, delete, drag start, property change)</li>
+</ul>
+<h2 id="z-level-ordering">Z-Level Ordering</h2>
+<table>
+<thead>
+<tr>
+<th>Z-Level</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-10</td>
+<td>Grid dots</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Lines (wires, busbars, component lines)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Shapes (rectangles, ellipses, polygons, label backgrounds)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Text labels, annotations, pin labels</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Connection node dots</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Pin snap highlights</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
