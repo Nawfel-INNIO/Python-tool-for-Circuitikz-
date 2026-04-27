@@ -23,6 +23,8 @@ class Component:
     color: str = ""
     voltage_dir: str = "v"
     current_dir: str = "i"
+    flow: str = ""
+    flow_dir: str = "f"
     uid: int = field(default_factory=_next_uid)
 
 

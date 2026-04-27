@@ -700,13 +700,15 @@ class CircuitScene(QGraphicsScene):
                 text.setPos(mx - tw / 2 + ox, my - th / 2 + oy)
                 text.setZValue(3)
                 self._dynamic_items.extend([line, bg, text])
-                # Voltage annotation (red, above/left)
+                # Voltage annotation (red)
                 if comp.value:
                     dx, dy = px2 - px1, py2 - py1
                     length = (dx**2 + dy**2) ** 0.5
                     if length > 0:
                         nx, ny = -dy / length, dx / length
-                        offset = 18
+                        # v^ = above (positive normal), v_ = below, v/v< = above
+                        above = comp.voltage_dir not in ("v_",)
+                        offset = 18 if above else -18
                         vmx = mx + nx * offset
                         vmy = my + ny * offset
                         v_text = self.addText(comp.value, QFont("Arial", 6))
@@ -715,9 +717,13 @@ class CircuitScene(QGraphicsScene):
                         v_text.setPos(vmx - vr.width() / 2, vmy - vr.height() / 2)
                         v_text.setZValue(3)
                         self._dynamic_items.append(v_text)
-                        # Polarity markers
+                        # Polarity: v< reverses + and −
                         ux, uy = dx / length, dy / length
-                        for sym, sign in [("+", -1), ("−", 1)]:
+                        if comp.voltage_dir in ("v<",):
+                            syms = [("−", -1), ("+", 1)]
+                        else:
+                            syms = [("+", -1), ("−", 1)]
+                        for sym, sign in syms:
                             sx = vmx + sign * ux * 14
                             sy = vmy + sign * uy * 14
                             st = self.addText(sym, QFont("Arial", 6, QFont.Bold))
@@ -726,16 +732,21 @@ class CircuitScene(QGraphicsScene):
                             st.setPos(sx - sr.width() / 2, sy - sr.height() / 2)
                             st.setZValue(3)
                             self._dynamic_items.append(st)
-                # Current annotation (green, below/right)
+                # Current annotation (green)
                 if comp.current:
                     dx, dy = px2 - px1, py2 - py1
                     length = (dx**2 + dy**2) ** 0.5
                     if length > 0:
                         nx, ny = -dy / length, dx / length
-                        offset = -16
+                        # i^ = above, i_ = below, i/i< = below
+                        above = comp.current_dir in ("i^",)
+                        offset = 18 if above else -16
                         imx = mx + nx * offset
                         imy = my + ny * offset
                         ux, uy = dx / length, dy / length
+                        # i< reverses arrow direction
+                        if comp.current_dir in ("i<",):
+                            ux, uy = -ux, -uy
                         arrow_len = 12
                         arrow_line = self.addLine(
                             imx - ux * arrow_len, imy - uy * arrow_len,
@@ -744,18 +755,13 @@ class CircuitScene(QGraphicsScene):
                         )
                         arrow_line.setZValue(3)
                         self._dynamic_items.append(arrow_line)
-                        # Arrowhead
                         ax, ay = imx + ux * arrow_len, imy + uy * arrow_len
-                        head1 = self.addLine(
-                            ax, ay,
+                        head1 = self.addLine(ax, ay,
                             ax - ux * 5 + ny * 3, ay - uy * 5 - nx * 3,
-                            QPen(QColor(0, 140, 0), 1.5),
-                        )
-                        head2 = self.addLine(
-                            ax, ay,
+                            QPen(QColor(0, 140, 0), 1.5))
+                        head2 = self.addLine(ax, ay,
                             ax - ux * 5 - ny * 3, ay - uy * 5 + nx * 3,
-                            QPen(QColor(0, 140, 0), 1.5),
-                        )
+                            QPen(QColor(0, 140, 0), 1.5))
                         head1.setZValue(3)
                         head2.setZValue(3)
                         self._dynamic_items.extend([head1, head2])
@@ -765,6 +771,46 @@ class CircuitScene(QGraphicsScene):
                         i_text.setPos(imx - ir.width() / 2, imy - ir.height() / 2 - 10)
                         i_text.setZValue(3)
                         self._dynamic_items.append(i_text)
+                # Flow annotation (blue)
+                if comp.flow:
+                    dx, dy = px2 - px1, py2 - py1
+                    length = (dx**2 + dy**2) ** 0.5
+                    if length > 0:
+                        nx, ny = -dy / length, dx / length
+                        # f^ = above, f_ = below, f/f< = centered on line
+                        if comp.flow_dir in ("f^",):
+                            offset = 30
+                        elif comp.flow_dir in ("f_",):
+                            offset = -30
+                        else:
+                            offset = 0
+                        fmx = mx + nx * offset
+                        fmy = my + ny * offset
+                        ux, uy = dx / length, dy / length
+                        if comp.flow_dir in ("f<",):
+                            ux, uy = -ux, -uy
+                        arrow_len = 10
+                        flow_pen = QPen(QColor(0, 80, 200), 1.5)
+                        flow_line = self.addLine(
+                            fmx - ux * arrow_len, fmy - uy * arrow_len,
+                            fmx + ux * arrow_len, fmy + uy * arrow_len,
+                            flow_pen)
+                        flow_line.setZValue(3)
+                        self._dynamic_items.append(flow_line)
+                        fax, fay = fmx + ux * arrow_len, fmy + uy * arrow_len
+                        fh1 = self.addLine(fax, fay,
+                            fax - ux * 5 + ny * 3, fay - uy * 5 - nx * 3, flow_pen)
+                        fh2 = self.addLine(fax, fay,
+                            fax - ux * 5 - ny * 3, fay - uy * 5 + nx * 3, flow_pen)
+                        fh1.setZValue(3)
+                        fh2.setZValue(3)
+                        self._dynamic_items.extend([fh1, fh2])
+                        f_text = self.addText(comp.flow, QFont("Arial", 6))
+                        f_text.setDefaultTextColor(QColor(0, 80, 200))
+                        fr = f_text.boundingRect()
+                        f_text.setPos(fmx - fr.width() / 2, fmy - fr.height() / 2 - 10)
+                        f_text.setZValue(3)
+                        self._dynamic_items.append(f_text)
 
     def _draw_nodes(self):
         positions = set()

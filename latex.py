@@ -56,6 +56,7 @@ def generate_latex(circuit: Circuit) -> str:
         label = f", l=${comp.label}$" if comp.label else ""
         value = f", {comp.voltage_dir}=${comp.value}$" if comp.value else ""
         current = f", {comp.current_dir}=${comp.current}$" if comp.current else ""
+        flow = f", {comp.flow_dir}=${comp.flow}$" if comp.flow else ""
         annotation = f", a=${comp.annotation}$" if comp.annotation else ""
         color_opt = f", color={{{colors_used[comp.color]}}}" if comp.color else ""
 
@@ -73,7 +74,7 @@ def generate_latex(circuit: Circuit) -> str:
                 lines.append(f"  \\draw{draw_opts} {a} node[{style}] {{{lbl}}};")
         else:
             kind = info["circuitikz"]
-            lines.append(f"  \\draw {a} to[{kind}{label}{value}{current}{annotation}{color_opt}] {b};")
+            lines.append(f"  \\draw {a} to[{kind}{label}{value}{current}{flow}{annotation}{color_opt}] {b};")
 
     lines.append(r"\end{circuitikz}")
     return "\n".join(lines)
@@ -88,7 +89,8 @@ def circuit_to_dict(circuit: Circuit) -> dict:
              "x1": c.x1, "y1": c.y1, "x2": c.x2, "y2": c.y2,
              "current": c.current, "annotation": c.annotation,
              "color": c.color, "voltage_dir": c.voltage_dir,
-             "current_dir": c.current_dir}
+             "current_dir": c.current_dir,
+             "flow": c.flow, "flow_dir": c.flow_dir}
             for c in circuit.components
         ],
         "busbars": [

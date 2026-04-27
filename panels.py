@@ -61,6 +61,15 @@ class PropertyPanel(QGroupBox):
         current_layout.setContentsMargins(0, 0, 0, 0)
         current_layout.addWidget(self.current_edit, 1)
         current_layout.addWidget(self.current_dir)
+        self.flow_edit = QLineEdit()
+        self.flow_edit.setPlaceholderText("e.g. I_1")
+        self.flow_dir = QComboBox()
+        self.flow_dir.addItems(["f=", "f<=", "f^=", "f_="])
+        flow_row = QWidget()
+        flow_layout = QHBoxLayout(flow_row)
+        flow_layout.setContentsMargins(0, 0, 0, 0)
+        flow_layout.addWidget(self.flow_edit, 1)
+        flow_layout.addWidget(self.flow_dir)
         self.annotation_edit = QLineEdit()
         self.annotation_edit.setPlaceholderText("e.g. 10\\Omega")
         self.color_btn = QPushButton("Default")
@@ -73,6 +82,7 @@ class PropertyPanel(QGroupBox):
         layout.addRow("Label:", self.label_edit)
         layout.addRow("Value (v):", value_row)
         layout.addRow("Current (i):", current_row)
+        layout.addRow("Flow (f):", flow_row)
         layout.addRow("Annotation:", self.annotation_edit)
         layout.addRow("Color:", self.color_btn)
         layout.addRow(self.delete_btn)
@@ -83,6 +93,8 @@ class PropertyPanel(QGroupBox):
         self.voltage_dir.currentIndexChanged.connect(self._apply)
         self.current_edit.textChanged.connect(self._apply)
         self.current_dir.currentIndexChanged.connect(self._apply)
+        self.flow_edit.textChanged.connect(self._apply)
+        self.flow_dir.currentIndexChanged.connect(self._apply)
         self.annotation_edit.textChanged.connect(self._apply)
         self.delete_btn.clicked.connect(self._on_delete)
         self.setEnabled(False)
@@ -96,9 +108,11 @@ class PropertyPanel(QGroupBox):
             self.label_edit.clear()
             self.value_edit.clear()
             self.current_edit.clear()
+            self.flow_edit.clear()
             self.annotation_edit.clear()
             self.voltage_dir.setCurrentIndex(0)
             self.current_dir.setCurrentIndex(0)
+            self.flow_dir.setCurrentIndex(0)
             self._set_color_btn("")
             self._updating = False
             return
@@ -113,6 +127,9 @@ class PropertyPanel(QGroupBox):
             self.current_edit.setEnabled(False)
             self.current_edit.clear()
             self.current_dir.setEnabled(False)
+            self.flow_edit.setEnabled(False)
+            self.flow_edit.clear()
+            self.flow_dir.setEnabled(False)
             self.annotation_edit.setEnabled(False)
             self.annotation_edit.clear()
             self.color_btn.setEnabled(False)
@@ -133,6 +150,11 @@ class PropertyPanel(QGroupBox):
             self.current_dir.setEnabled(True)
             idir_map = {"i": 0, "i<": 1, "i^": 2, "i_": 3}
             self.current_dir.setCurrentIndex(idir_map.get(obj.current_dir, 0))
+            self.flow_edit.setEnabled(True)
+            self.flow_edit.setText(obj.flow)
+            self.flow_dir.setEnabled(True)
+            fdir_map = {"f": 0, "f<": 1, "f^": 2, "f_": 3}
+            self.flow_dir.setCurrentIndex(fdir_map.get(obj.flow_dir, 0))
             self.annotation_edit.setEnabled(True)
             self.annotation_edit.setText(obj.annotation)
             self.color_btn.setEnabled(True)
@@ -155,6 +177,9 @@ class PropertyPanel(QGroupBox):
             self._current.current = self.current_edit.text()
             idir_list = ["i", "i<", "i^", "i_"]
             self._current.current_dir = idir_list[self.current_dir.currentIndex()]
+            self._current.flow = self.flow_edit.text()
+            fdir_list = ["f", "f<", "f^", "f_"]
+            self._current.flow_dir = fdir_list[self.flow_dir.currentIndex()]
             self._current.annotation = self.annotation_edit.text()
             self._current.color = self._color_value
         if self.on_changed:
