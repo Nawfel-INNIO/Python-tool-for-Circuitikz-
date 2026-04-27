@@ -15,16 +15,6 @@ A Python desktop application for building circuit diagrams visually and generati
 - **Export .tex** — export a complete standalone LaTeX document
 - **Undo / Redo** — Ctrl+Z / Ctrl+Shift+Z with full state snapshots
 - **Property panel** — edit label, value, current arrow (`i=`), and annotation (`a=`) per component
-- **Zoom** — mouse wheel to zoom, "Zoom Fit" button to frame all components
-
-### Available Components
-
-| Basic | Power Systems |
-|---|---|
-| Resistor, Capacitor, Inductor | Busbar, Circuit Breaker, Fuse |
-| Voltage Source, Current Source, Diode | Disconnector, Switch, Transformer |
-| Battery, Lamp, Push Button, SPST Switch | Current Transformer, Generator, Motor |
-| Wire, Ground, VCC | Surge Arrester |
 
 ## Setup
 
