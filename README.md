@@ -39,7 +39,6 @@ A Python desktop application for building circuit diagrams visually and generati
 
 ```bash
 git clone <repo-url>
-cd Latex
 ```
 
 ### 2. Create a virtual environment and install dependencies
@@ -70,18 +69,6 @@ The app needs `pdflatex` with the following LaTeX packages: **circuitikz**, **st
 ```powershell
 winget install MiKTeX.MiKTeX --accept-package-agreements --accept-source-agreements
 miktex packages install circuitikz standalone siunitx
-```
-
-**Linux (TeX Live):**
-```bash
-sudo apt install texlive-base texlive-pictures
-tlmgr install circuitikz standalone siunitx
-```
-
-**macOS (MacTeX):**
-```bash
-brew install --cask mactex-no-gui
-tlmgr install circuitikz standalone siunitx
 ```
 
 ### 5. Run
