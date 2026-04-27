@@ -45,7 +45,23 @@ class CircuitScene(QGraphicsScene):
                 dot.setZValue(-10)
 
     def _snap(self, pos: QPointF):
-        return round(pos.x() / GRID_SIZE), round(pos.y() / GRID_SIZE)
+        gx = round(pos.x() / GRID_SIZE)
+        gy = round(pos.y() / GRID_SIZE)
+        # Snap to nearby pin positions (within 1 grid unit)
+        if self._mode in ("place_second", "wire", "place_first"):
+            best_pin = None
+            best_d = 1.5  # threshold in grid units
+            for comp in self.circuit.components:
+                info = COMPONENTS[comp.kind]
+                for pdx, pdy in info.get("pin_offsets", {}).values():
+                    px, py = comp.x1 + pdx, comp.y1 + pdy
+                    d = ((gx - px) ** 2 + (gy - py) ** 2) ** 0.5
+                    if d < best_d:
+                        best_d = d
+                        best_pin = (px, py)
+            if best_pin:
+                return best_pin
+        return gx, gy
 
     def _next_label(self, kind):
         n = self._counters.get(kind, 0) + 1
@@ -362,6 +378,19 @@ class CircuitScene(QGraphicsScene):
         cross = QPen(QColor(255, 100, 0), 1, Qt.DashLine)
         self._preview_items.append(self.addLine(px - 8, py, px + 8, py, cross))
         self._preview_items.append(self.addLine(px, py - 8, px, py + 8, cross))
+        # Highlight if snapped to a pin
+        if self._mode in ("place_second", "wire", "place_first"):
+            for comp in self.circuit.components:
+                info = COMPONENTS[comp.kind]
+                for pdx, pdy in info.get("pin_offsets", {}).values():
+                    if gx == comp.x1 + pdx and gy == comp.y1 + pdy:
+                        highlight = self.addEllipse(
+                            px - 8, py - 8, 16, 16,
+                            QPen(QColor(0, 200, 0), 2), QBrush(Qt.NoBrush),
+                        )
+                        highlight.setZValue(5)
+                        self._preview_items.append(highlight)
+                        break
         origin = self._first_pos
         if self._mode in ("place_second", "busbar_second") and origin:
             fpx, fpy = origin[0] * GRID_SIZE, origin[1] * GRID_SIZE
@@ -625,6 +654,21 @@ class CircuitScene(QGraphicsScene):
                 lbl.setPos(px1 + 16, py1 - 6)
                 lbl.setZValue(3)
                 self._dynamic_items.append(lbl)
+            # Draw pin dots and labels for multi-port components
+            if info.get("pin_offsets"):
+                pin_color = QColor(100, 100, 100)
+                for name, (pdx, pdy) in info["pin_offsets"].items():
+                    ppx = px1 + pdx * GRID_SIZE
+                    ppy = py1 + pdy * GRID_SIZE
+                    dot = self.addEllipse(ppx - 3, ppy - 3, 6, 6,
+                                          QPen(Qt.NoPen), QBrush(pin_color))
+                    dot.setZValue(3)
+                    self._dynamic_items.append(dot)
+                    pin_lbl = self.addText(name, QFont("Arial", 5))
+                    pin_lbl.setDefaultTextColor(pin_color)
+                    pin_lbl.setPos(ppx + 4, ppy - 8)
+                    pin_lbl.setZValue(3)
+                    self._dynamic_items.append(pin_lbl)
         else:
             px2, py2 = comp.x2 * GRID_SIZE, comp.y2 * GRID_SIZE
             mx, my = (px1 + px2) / 2, (py1 + py2) / 2
@@ -656,12 +700,81 @@ class CircuitScene(QGraphicsScene):
                 text.setPos(mx - tw / 2 + ox, my - th / 2 + oy)
                 text.setZValue(3)
                 self._dynamic_items.extend([line, bg, text])
+                # Voltage annotation (red, above/left)
+                if comp.value:
+                    dx, dy = px2 - px1, py2 - py1
+                    length = (dx**2 + dy**2) ** 0.5
+                    if length > 0:
+                        nx, ny = -dy / length, dx / length
+                        offset = 18
+                        vmx = mx + nx * offset
+                        vmy = my + ny * offset
+                        v_text = self.addText(comp.value, QFont("Arial", 6))
+                        v_text.setDefaultTextColor(QColor(200, 0, 0))
+                        vr = v_text.boundingRect()
+                        v_text.setPos(vmx - vr.width() / 2, vmy - vr.height() / 2)
+                        v_text.setZValue(3)
+                        self._dynamic_items.append(v_text)
+                        # Polarity markers
+                        ux, uy = dx / length, dy / length
+                        for sym, sign in [("+", -1), ("−", 1)]:
+                            sx = vmx + sign * ux * 14
+                            sy = vmy + sign * uy * 14
+                            st = self.addText(sym, QFont("Arial", 6, QFont.Bold))
+                            st.setDefaultTextColor(QColor(200, 0, 0))
+                            sr = st.boundingRect()
+                            st.setPos(sx - sr.width() / 2, sy - sr.height() / 2)
+                            st.setZValue(3)
+                            self._dynamic_items.append(st)
+                # Current annotation (green, below/right)
+                if comp.current:
+                    dx, dy = px2 - px1, py2 - py1
+                    length = (dx**2 + dy**2) ** 0.5
+                    if length > 0:
+                        nx, ny = -dy / length, dx / length
+                        offset = -16
+                        imx = mx + nx * offset
+                        imy = my + ny * offset
+                        ux, uy = dx / length, dy / length
+                        arrow_len = 12
+                        arrow_line = self.addLine(
+                            imx - ux * arrow_len, imy - uy * arrow_len,
+                            imx + ux * arrow_len, imy + uy * arrow_len,
+                            QPen(QColor(0, 140, 0), 1.5),
+                        )
+                        arrow_line.setZValue(3)
+                        self._dynamic_items.append(arrow_line)
+                        # Arrowhead
+                        ax, ay = imx + ux * arrow_len, imy + uy * arrow_len
+                        head1 = self.addLine(
+                            ax, ay,
+                            ax - ux * 5 + ny * 3, ay - uy * 5 - nx * 3,
+                            QPen(QColor(0, 140, 0), 1.5),
+                        )
+                        head2 = self.addLine(
+                            ax, ay,
+                            ax - ux * 5 - ny * 3, ay - uy * 5 + nx * 3,
+                            QPen(QColor(0, 140, 0), 1.5),
+                        )
+                        head1.setZValue(3)
+                        head2.setZValue(3)
+                        self._dynamic_items.extend([head1, head2])
+                        i_text = self.addText(comp.current, QFont("Arial", 6))
+                        i_text.setDefaultTextColor(QColor(0, 140, 0))
+                        ir = i_text.boundingRect()
+                        i_text.setPos(imx - ir.width() / 2, imy - ir.height() / 2 - 10)
+                        i_text.setZValue(3)
+                        self._dynamic_items.append(i_text)
 
     def _draw_nodes(self):
         positions = set()
         for comp in self.circuit.components:
             positions.add((comp.x1, comp.y1))
-            if not COMPONENTS[comp.kind].get("node_style"):
+            info = COMPONENTS[comp.kind]
+            if info.get("pin_offsets"):
+                for pdx, pdy in info["pin_offsets"].values():
+                    positions.add((comp.x1 + pdx, comp.y1 + pdy))
+            elif not info.get("node_style"):
                 positions.add((comp.x2, comp.y2))
         brush = QBrush(QColor(0, 0, 0))
         for gx, gy in positions:

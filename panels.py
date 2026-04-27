@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QTreeWidget, QTreeWidgetItem, QGroupBox, QFormLayout,
-    QComboBox, QLineEdit, QPushButton, QColorDialog,
+    QComboBox, QLineEdit, QPushButton, QColorDialog, QHBoxLayout, QWidget,
 )
 
 from models import Component, Busbar, COMPONENTS
@@ -45,8 +45,22 @@ class PropertyPanel(QGroupBox):
         self.label_edit.setPlaceholderText("e.g. R_1")
         self.value_edit = QLineEdit()
         self.value_edit.setPlaceholderText("e.g. 1k\\Omega")
+        self.voltage_dir = QComboBox()
+        self.voltage_dir.addItems(["v=", "v<=", "v^=", "v_="])
+        value_row = QWidget()
+        value_layout = QHBoxLayout(value_row)
+        value_layout.setContentsMargins(0, 0, 0, 0)
+        value_layout.addWidget(self.value_edit, 1)
+        value_layout.addWidget(self.voltage_dir)
         self.current_edit = QLineEdit()
         self.current_edit.setPlaceholderText("e.g. I_1")
+        self.current_dir = QComboBox()
+        self.current_dir.addItems(["i=", "i<=", "i^=", "i_="])
+        current_row = QWidget()
+        current_layout = QHBoxLayout(current_row)
+        current_layout.setContentsMargins(0, 0, 0, 0)
+        current_layout.addWidget(self.current_edit, 1)
+        current_layout.addWidget(self.current_dir)
         self.annotation_edit = QLineEdit()
         self.annotation_edit.setPlaceholderText("e.g. 10\\Omega")
         self.color_btn = QPushButton("Default")
@@ -57,8 +71,8 @@ class PropertyPanel(QGroupBox):
 
         layout.addRow("Type:", self.kind_combo)
         layout.addRow("Label:", self.label_edit)
-        layout.addRow("Value:", self.value_edit)
-        layout.addRow("Current:", self.current_edit)
+        layout.addRow("Value (v):", value_row)
+        layout.addRow("Current (i):", current_row)
         layout.addRow("Annotation:", self.annotation_edit)
         layout.addRow("Color:", self.color_btn)
         layout.addRow(self.delete_btn)
@@ -66,7 +80,9 @@ class PropertyPanel(QGroupBox):
         self.kind_combo.currentIndexChanged.connect(self._apply)
         self.label_edit.textChanged.connect(self._apply)
         self.value_edit.textChanged.connect(self._apply)
+        self.voltage_dir.currentIndexChanged.connect(self._apply)
         self.current_edit.textChanged.connect(self._apply)
+        self.current_dir.currentIndexChanged.connect(self._apply)
         self.annotation_edit.textChanged.connect(self._apply)
         self.delete_btn.clicked.connect(self._on_delete)
         self.setEnabled(False)
@@ -81,6 +97,8 @@ class PropertyPanel(QGroupBox):
             self.value_edit.clear()
             self.current_edit.clear()
             self.annotation_edit.clear()
+            self.voltage_dir.setCurrentIndex(0)
+            self.current_dir.setCurrentIndex(0)
             self._set_color_btn("")
             self._updating = False
             return
@@ -91,8 +109,10 @@ class PropertyPanel(QGroupBox):
             self.label_edit.setText(obj.label)
             self.value_edit.setEnabled(False)
             self.value_edit.clear()
+            self.voltage_dir.setEnabled(False)
             self.current_edit.setEnabled(False)
             self.current_edit.clear()
+            self.current_dir.setEnabled(False)
             self.annotation_edit.setEnabled(False)
             self.annotation_edit.clear()
             self.color_btn.setEnabled(False)
@@ -104,8 +124,15 @@ class PropertyPanel(QGroupBox):
             self.label_edit.setText(obj.label)
             self.value_edit.setEnabled(True)
             self.value_edit.setText(obj.value)
+            self.voltage_dir.setEnabled(True)
+            # Map stored value to combo index
+            vdir_map = {"v": 0, "v<": 1, "v^": 2, "v_": 3}
+            self.voltage_dir.setCurrentIndex(vdir_map.get(obj.voltage_dir, 0))
             self.current_edit.setEnabled(True)
             self.current_edit.setText(obj.current)
+            self.current_dir.setEnabled(True)
+            idir_map = {"i": 0, "i<": 1, "i^": 2, "i_": 3}
+            self.current_dir.setCurrentIndex(idir_map.get(obj.current_dir, 0))
             self.annotation_edit.setEnabled(True)
             self.annotation_edit.setText(obj.annotation)
             self.color_btn.setEnabled(True)
@@ -123,7 +150,11 @@ class PropertyPanel(QGroupBox):
                 self._current.kind = new_kind
             self._current.label = self.label_edit.text()
             self._current.value = self.value_edit.text()
+            vdir_list = ["v", "v<", "v^", "v_"]
+            self._current.voltage_dir = vdir_list[self.voltage_dir.currentIndex()]
             self._current.current = self.current_edit.text()
+            idir_list = ["i", "i<", "i^", "i_"]
+            self._current.current_dir = idir_list[self.current_dir.currentIndex()]
             self._current.annotation = self.annotation_edit.text()
             self._current.color = self._color_value
         if self.on_changed:

@@ -33,13 +33,29 @@ def generate_latex(circuit: Circuit) -> str:
         for tx in sorted(taps):
             lines.append(f"  \\draw ({tx},{-bb.y}) -- ({tx},{-bb.y - 0.3});")
 
+    # Build pin-to-anchor map: (x,y) -> "(nodename.anchor)"
+    pin_map: dict[tuple[int, int], str] = {}
     for comp in circuit.components:
         info = COMPONENTS[comp.kind]
-        a = f"({comp.x1},{-comp.y1})"
-        b = f"({comp.x2},{-comp.y2})"
+        offsets = info.get("pin_offsets", {})
+        if offsets:
+            node_name = comp.label.replace(" ", "").replace("_", "") if comp.label else f"node{comp.uid}"
+            for pin_name, (pdx, pdy) in offsets.items():
+                pin_map[(comp.x1 + pdx, comp.y1 + pdy)] = f"({node_name}.{pin_name})"
+
+    def _coord(x, y):
+        key = (x, y)
+        if key in pin_map:
+            return pin_map[key]
+        return f"({x},{-y})"
+
+    for comp in circuit.components:
+        info = COMPONENTS[comp.kind]
+        a = _coord(comp.x1, comp.y1)
+        b = _coord(comp.x2, comp.y2)
         label = f", l=${comp.label}$" if comp.label else ""
-        value = f", v=${comp.value}$" if comp.value else ""
-        current = f", i=${comp.current}$" if comp.current else ""
+        value = f", {comp.voltage_dir}=${comp.value}$" if comp.value else ""
+        current = f", {comp.current_dir}=${comp.current}$" if comp.current else ""
         annotation = f", a=${comp.annotation}$" if comp.annotation else ""
         color_opt = f", color={{{colors_used[comp.color]}}}" if comp.color else ""
 
@@ -51,7 +67,8 @@ def generate_latex(circuit: Circuit) -> str:
                 # Named node for multi-terminal components (transistors, op-amps, etc.)
                 node_name = comp.label.replace(" ", "").replace("_", "") if comp.label else f"node{comp.uid}"
                 color_prefix = f"[{colors_used[comp.color]}] " if comp.color else ""
-                lines.append(f"  \\node{color_prefix}[{style}] ({node_name}) at {a} {{{lbl}}};")
+                raw_pos = f"({comp.x1},{-comp.y1})"
+                lines.append(f"  \\node{color_prefix}[{style}] ({node_name}) at {raw_pos} {{{lbl}}};")
             else:
                 lines.append(f"  \\draw{draw_opts} {a} node[{style}] {{{lbl}}};")
         else:
@@ -70,7 +87,8 @@ def circuit_to_dict(circuit: Circuit) -> dict:
             {"kind": c.kind, "label": c.label, "value": c.value,
              "x1": c.x1, "y1": c.y1, "x2": c.x2, "y2": c.y2,
              "current": c.current, "annotation": c.annotation,
-             "color": c.color}
+             "color": c.color, "voltage_dir": c.voltage_dir,
+             "current_dir": c.current_dir}
             for c in circuit.components
         ],
         "busbars": [
