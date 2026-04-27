@@ -329,9 +329,7 @@ class CircuitScene(QGraphicsScene):
         self._redraw()
 
     def mouseMoveEvent(self, event):
-        if self._dragging and self._drag_target:
-            self.drag_move(event.scenePos())
-        super().mouseMoveEvent(event)
+        pass
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton and self._dragging:
@@ -851,7 +849,6 @@ class CircuitCanvas(QGraphicsView):
             scene.drag_move(scene_pos)
         else:
             scene.update_preview(scene_pos)
-        super().mouseMoveEvent(event)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
