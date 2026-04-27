@@ -44,6 +44,18 @@ class Circuit:
 
 
 COMPONENTS = {
+    # --- Power Systems ---
+    "busbar":  {"name": "Busbar",              "circuitikz": "busbar",         "category": "Power Systems",
+                "special": True},
+    "breaker": {"name": "Circuit Breaker",     "circuitikz": "cspst",          "category": "Power Systems"},
+    "fuse":    {"name": "Fuse",                "circuitikz": "fuse",           "category": "Power Systems"},
+    "discon":  {"name": "Disconnector",        "circuitikz": "nos",            "category": "Power Systems"},
+    "switch":  {"name": "Switch",              "circuitikz": "nos",            "category": "Power Systems"},
+    "CT":      {"name": "Current Transformer", "circuitikz": "cute inductor",  "category": "Power Systems"},
+    "trafo":   {"name": "Transformer",         "circuitikz": "transformer",    "category": "Power Systems"},
+    "gen":     {"name": "Generator",           "circuitikz": "sV",             "category": "Power Systems"},
+    "motor":   {"name": "Motor",               "circuitikz": "sV",             "category": "Power Systems"},
+    "arrester":{"name": "Surge Arrester",      "circuitikz": "surge arrester", "category": "Power Systems"},
     # --- Basic ---
     "R":       {"name": "Resistor",            "circuitikz": "R",              "category": "Basic"},
     "C":       {"name": "Capacitor",           "circuitikz": "C",              "category": "Basic"},
@@ -246,16 +258,4 @@ COMPONENTS = {
     "pentode":  {"name": "Pentode",            "circuitikz": "pentode",         "category": "Tubes",
                  "node_style": "pentode",       "anchors": ["anode", "cathode", "grid"],
                  "pin_offsets": {"anode": (0, -1), "cathode": (0, 1), "grid": (-1, 0)}},
-    # --- Power Systems ---
-    "busbar":  {"name": "Busbar",              "circuitikz": "busbar",         "category": "Power Systems",
-                "special": True},
-    "breaker": {"name": "Circuit Breaker",     "circuitikz": "cspst",          "category": "Power Systems"},
-    "fuse":    {"name": "Fuse",                "circuitikz": "fuse",           "category": "Power Systems"},
-    "discon":  {"name": "Disconnector",        "circuitikz": "nos",            "category": "Power Systems"},
-    "switch":  {"name": "Switch",              "circuitikz": "nos",            "category": "Power Systems"},
-    "CT":      {"name": "Current Transformer", "circuitikz": "cute inductor",  "category": "Power Systems"},
-    "trafo":   {"name": "Transformer",         "circuitikz": "transformer",    "category": "Power Systems"},
-    "gen":     {"name": "Generator",           "circuitikz": "sV",             "category": "Power Systems"},
-    "motor":   {"name": "Motor",               "circuitikz": "sV",             "category": "Power Systems"},
-    "arrester":{"name": "Surge Arrester",      "circuitikz": "surge arrester", "category": "Power Systems"},
 }
