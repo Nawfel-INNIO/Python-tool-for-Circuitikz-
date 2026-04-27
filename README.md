@@ -56,10 +56,6 @@ uv pip install PyQt5 PyMuPDF
 # Windows CMD
 .\.venv\Scripts\activate.bat
 
-# Linux / macOS
-source .venv/bin/activate
-```
-
 ### 4. Install LaTeX dependencies
 
 The app needs `pdflatex` with the following LaTeX packages: **circuitikz**, **standalone**, and **siunitx**.
