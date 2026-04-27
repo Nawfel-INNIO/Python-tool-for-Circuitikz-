@@ -10,7 +10,7 @@ from PyQt5.QtGui import QImage, QPixmap, QKeySequence
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QSplitter, QPlainTextEdit,
     QLabel, QScrollArea, QPushButton, QVBoxLayout, QHBoxLayout, QWidget,
-    QShortcut, QTabWidget, QFileDialog, QStatusBar,
+    QShortcut, QTabWidget, QFileDialog,
 )
 
 from models import Circuit, COMPONENTS
@@ -188,11 +188,16 @@ class MainWindow(QMainWindow):
             self.convention_combo.addItem(label)
         self.convention_combo.currentTextChanged.connect(lambda _: self._render_timer.start())
 
+        from PyQt5.QtWidgets import QCheckBox
+        self.auto_build_cb = QCheckBox("Auto build")
+        self.auto_build_cb.setChecked(True)
+
         btn_layout.addWidget(self.save_btn)
         btn_layout.addWidget(self.load_btn)
         btn_layout.addWidget(self.export_btn)
         btn_layout.addWidget(self.fit_btn)
         btn_layout.addWidget(self.convention_combo)
+        btn_layout.addWidget(self.auto_build_cb)
 
         self.error_label = QPlainTextEdit()
         self.error_label.setReadOnly(True)
@@ -233,7 +238,8 @@ class MainWindow(QMainWindow):
     def _on_circuit_changed(self):
         latex = generate_latex(self.scene.circuit)
         self.latex_view.setPlainText(latex)
-        self._render_timer.start()
+        if self.auto_build_cb.isChecked():
+            self._render_timer.start()
 
     def _on_selection_changed(self, obj):
         self.props.set_component(obj)
